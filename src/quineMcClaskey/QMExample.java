@@ -12,6 +12,6 @@ public class QMExample {
 		data.add(new BitArray("x101"));
 		data.add(new BitArray("0x10"));
 		data.add(new BitArray("1x10"));
-		for (BitArray i : BitArray.normalize(data)) System.out.println(i.toString());
+		QM qm = new QM(data);
 	}
 }

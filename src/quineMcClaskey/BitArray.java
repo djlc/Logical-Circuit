@@ -47,6 +47,25 @@ public class BitArray {
 		return bin.size();
 	}
 
+	// iビット目の値を取得
+	public Bit getBit(int i) {
+		return bin.get(i);
+	}
+
+	// iビット目を削除して詰める
+	public void remove(int i) {
+		if (i >= 0 && i < this.bin.size()) {
+			this.bin.remove(i);
+		}
+	}
+
+	// iビット目の値を設定
+	public void set(int i, Bit b) {
+		if (i >= 0 && i < this.bin.size()) {
+			this.bin.set(i, b);
+		}
+	}
+
 	// ハミング重み
 	public int getWeight() {
 		return w(this);
@@ -61,13 +80,13 @@ public class BitArray {
 	}
 
 	// ハミング距離
-	private static int d(BitArray a, BitArray b) {
+	public static int d(BitArray a, BitArray b) {
 		if (a.bin.size() != b.bin.size())
 			return -1;
 		int c = 0;
 		for (int i = 0; i < a.getSize(); i++) {
 			if (a.bin.get(i) != b.bin.get(i))
-				i++;
+				c++;
 		}
 		return c;
 	}
@@ -129,9 +148,41 @@ public class BitArray {
 
 	// don't care bit に値を代入したものをリスト化する
 	public static ArrayList<BitArray> normalize(ArrayList<BitArray> b) {
+		// リスト
 		ArrayList<BitArray> data = new ArrayList<>(b);
-		recursive(data);
+
+		// 再帰処理
+		recursiveNormalize(data);
+
 		// 重複除去
+		deduplication(data);
+
+		return data;
+	}
+
+	// 上のメソッドで使う再帰メソッド
+	private static void recursiveNormalize(ArrayList<BitArray> data) {
+		for (int i = 0; i < data.size(); i++) {
+			for (int j = 0; j < data.get(i).bin.size(); j++) {
+				if (data.get(i).bin.get(j) == Bit.DONT_CARE) {
+
+					BitArray temp1 = new BitArray(data.get(i));
+					temp1.bin.set(j, Bit.LOW);
+					data.add(temp1);
+
+					BitArray temp2 = new BitArray(data.get(i));
+					temp2.bin.set(j, Bit.HIGH);
+					data.add(temp2);
+
+					data.remove(i);
+					recursiveNormalize(data);
+				}
+			}
+		}
+	}
+
+	// ビット列のリストの重複除去
+	public static void deduplication(ArrayList<BitArray> data) {
 		ArrayList<BitArray> unique = new ArrayList<>();
 		boolean f = false;
 		for (BitArray i : data) {
@@ -142,46 +193,18 @@ public class BitArray {
 					break;
 				}
 			}
-			if (!f) unique.add(i);
+			if (!f)
+				unique.add(i);
 		}
-		return unique;
-	}
-
-	private static void recursive(ArrayList<BitArray> data) {
-		for (int i = 0; i < data.size(); i++) {
-			for (int j = 0; j < data.get(i).bin.size(); j++) {
-				if (data.get(i).bin.get(j) == Bit.DONT_CARE) {
-
-					//System.out.print("[get] " + data.get(i).toString() + " {");
-					//for (int k = 0; k < data.size(); k++) {
-					//	System.out.print(data.get(k).toString());
-					//	if (k != data.size() - 1) System.out.print(", ");
-					//}
-					//System.out.println("}");
-
-					BitArray temp1 = new BitArray(data.get(i));
-					temp1.bin.set(j, Bit.LOW);
-					//System.out.println("[add] " + temp1.toString());
-					data.add(temp1);
-
-					BitArray temp2 = new BitArray(data.get(i));
-					temp2.bin.set(j, Bit.HIGH);
-					data.add(temp2);
-					//System.out.println("[add] " + temp2.toString());
-
-					//System.out.println("[rem] " + data.get(i).toString());
-					data.remove(i);
-					recursive(data);
-				}
-			}
-		}
+		data.clear();
+		data.addAll(unique);
 	}
 
 	@Override
 	public String toString() {
 		String str = "";
 		for (int i = 0; i < bin.size(); i++) {
-			switch(bin.get(i)) {
+			switch (bin.get(i)) {
 			case LOW:
 				str += "0";
 				break;
@@ -201,14 +224,28 @@ public class BitArray {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof BitArray) {
-			BitArray temp = (BitArray)obj;
-			if (temp.bin.size() != this.bin.size()) return false;
+			BitArray temp = (BitArray) obj;
+			if (temp.bin.size() != this.bin.size())
+				return false;
 			for (int i = 0; i < temp.bin.size(); i++) {
-				if (temp.bin.get(i) != this.bin.get(i)) return false;
+				if (temp.bin.get(i) != this.bin.get(i))
+					return false;
 			}
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	// don't careを許した場合のequals
+	public boolean semiEquals(BitArray b) {
+		if (b.bin.size() != this.bin.size())
+			return false;
+		for (int i = 0; i < b.bin.size(); i++) {
+			if ((b.bin.get(i) == Bit.LOW && this.bin.get(i) == Bit.HIGH)
+					|| (b.bin.get(i) == Bit.HIGH && this.bin.get(i) == Bit.LOW))
+				return false;
+		}
+		return true;
 	}
 }
