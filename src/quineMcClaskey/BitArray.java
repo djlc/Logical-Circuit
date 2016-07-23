@@ -11,6 +11,9 @@ public class BitArray {
 	// 中身
 	private ArrayList<Bit> bin;
 
+	// 簡単化済みか
+	public boolean simplified = false;
+
 	// "01x"の文字列からビット列を作成
 	public BitArray(String data) {
 		bin = new ArrayList<>(data.length());
@@ -203,20 +206,22 @@ public class BitArray {
 	@Override
 	public String toString() {
 		String str = "";
+		char a = 'A';
 		for (int i = 0; i < bin.size(); i++) {
 			switch (bin.get(i)) {
 			case LOW:
-				str += "0";
+				str += "~";
+				str += a;
 				break;
 			case HIGH:
-				str += "1";
+				str += a;
 				break;
 			case DONT_CARE:
-				str += "x";
 				break;
 			default:
 				break;
 			}
+			a++;
 		}
 		return str;
 	}

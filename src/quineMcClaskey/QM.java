@@ -1,6 +1,7 @@
 package quineMcClaskey;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class QM {
 		sortBySize();
 
 		// 簡単化
-		for (int c = 0; c < data.get(0).getSize(); c++) {
+		for (int c = 1; c <= data.get(0).getSize(); c++) {
 
 			// 比較操作
 			for (int i = 1; i <= maxSize; i++) {
@@ -36,16 +37,22 @@ public class QM {
 				}
 			}
 
+			// 簡単化出来なかったものは主項
+			for (Map.Entry<Integer, ArrayList<BitArray>> e : groupData.entrySet()) {
+				for (BitArray b : e.getValue()) {
+					if (b.simplified == false) {
+						prime.add(b);
+					}
+				}
+			}
+
 			// 重複除去
 			for (Map.Entry<Integer, ArrayList<BitArray>> e : newGroupData.entrySet()) {
 				BitArray.deduplication(e.getValue());
 			}
 
-			// もしリストが空ならばnewGroupDataのValueをArrayListに変換して終了
+			// もしリストが空ならば終了
 			if (newGroupData.isEmpty()) {
-				for (Map.Entry<Integer, ArrayList<BitArray>> e : groupData.entrySet()) {
-					prime.addAll(e.getValue());
-				}
 				break;
 			}
 
@@ -79,10 +86,9 @@ public class QM {
 			if (sum >= 2) removeList.add(j);
 		}
 		for (int i : removeList) {
-			prime.remove(i);
+			prime.set(i, null);
 		}
-
-		System.out.println(prime.toString());
+		prime.removeAll(Collections.singleton(null));
 	}
 
 	// 重み別にグループ分けする
@@ -104,6 +110,8 @@ public class QM {
 		for (BitArray i : groupData.get(num)) {
 			for (BitArray j : groupData.get(num + 1)) {
 				if (BitArray.d(i, j) == 1) {
+					i.simplified = true;
+					j.simplified = true;
 					for (int k = 0; k < i.getSize(); k++) {
 						if (i.getBit(k) != j.getBit(k)) {
 							BitArray t = new BitArray(i);
@@ -122,11 +130,6 @@ public class QM {
 
 	@Override
 	public String toString() {
-		String str = "";
-		for (int i = 0; i < min.size(); i++) {
-			str += min.get(i).toString();
-			str += (i != min.size() - 1) ? " + " : "";
-		}
-		return str;
+		return prime.toString();
 	}
 }
