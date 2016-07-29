@@ -3,26 +3,27 @@ package quineMcClaskey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class QM {
 
 	// 最小項
-	private ArrayList<BitArray> min;
+	private List<BitArray> min;
 
 	// 主項
-	private ArrayList<BitArray> prime = new ArrayList<>();
+	private List<BitArray> prime = new ArrayList<>();
 
 	// 重み別で分けた論理式 (<重み, 論理式>のHashで管理)
-	private HashMap<Integer, ArrayList<BitArray>> groupData = new HashMap<>();
-	private HashMap<Integer, ArrayList<BitArray>> newGroupData = new HashMap<>();
+	private Map<Integer, List<BitArray>> groupData = new HashMap<>();
+	private Map<Integer, List<BitArray>> newGroupData = new HashMap<>();
 
 
 	// ビット列の最大長
 	private int maxSize;
 
 	// コンストラクタ
-	public QM(ArrayList<BitArray> data) {
+	public QM(List<BitArray> data) {
 		// 論理式を加法標準形にする
 		this.min = BitArray.normalize(data);
 		sortBySize();
@@ -38,7 +39,7 @@ public class QM {
 			}
 
 			// 簡単化出来なかったものは主項
-			for (Map.Entry<Integer, ArrayList<BitArray>> e : groupData.entrySet()) {
+			for (Map.Entry<Integer, List<BitArray>> e : groupData.entrySet()) {
 				for (BitArray b : e.getValue()) {
 					if (b.simplified == false) {
 						prime.add(b);
@@ -47,7 +48,7 @@ public class QM {
 			}
 
 			// 重複除去
-			for (Map.Entry<Integer, ArrayList<BitArray>> e : newGroupData.entrySet()) {
+			for (Map.Entry<Integer, List<BitArray>> e : newGroupData.entrySet()) {
 				BitArray.deduplication(e.getValue());
 			}
 
@@ -65,7 +66,7 @@ public class QM {
 
 		// 最小項と主項の表を作って重複項の除去
 		int[][] table = new int[min.size()][prime.size()];
-		ArrayList<Integer> removeList = new ArrayList<>();
+		List<Integer> removeList = new ArrayList<>();
 
 		for (int i = 0; i < table.length; i++) {
 			for (int j = 0; j < table[i].length; j++) {

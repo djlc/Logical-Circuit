@@ -1,6 +1,7 @@
 package quineMcClaskey;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BitArray {
 
@@ -9,7 +10,7 @@ public class BitArray {
 	private static final BitArray ONE = new BitArray("1");
 
 	// 中身
-	private ArrayList<Bit> bin;
+	private List<Bit> bin;
 
 	// 簡単化済みか
 	public boolean simplified = false;
@@ -150,9 +151,9 @@ public class BitArray {
 	}
 
 	// don't care bit に値を代入したものをリスト化する
-	public static ArrayList<BitArray> normalize(ArrayList<BitArray> b) {
+	public static List<BitArray> normalize(List<BitArray> b) {
 		// リスト
-		ArrayList<BitArray> data = new ArrayList<>(b);
+		List<BitArray> data = new ArrayList<>(b);
 
 		// 再帰処理
 		recursiveNormalize(data);
@@ -164,7 +165,7 @@ public class BitArray {
 	}
 
 	// 上のメソッドで使う再帰メソッド
-	private static void recursiveNormalize(ArrayList<BitArray> data) {
+	private static void recursiveNormalize(List<BitArray> data) {
 		for (int i = 0; i < data.size(); i++) {
 			for (int j = 0; j < data.get(i).bin.size(); j++) {
 				if (data.get(i).bin.get(j) == Bit.DONT_CARE) {
@@ -185,8 +186,8 @@ public class BitArray {
 	}
 
 	// ビット列のリストの重複除去
-	public static void deduplication(ArrayList<BitArray> data) {
-		ArrayList<BitArray> unique = new ArrayList<>();
+	public static void deduplication(List<BitArray> data) {
+		List<BitArray> unique = new ArrayList<>();
 		boolean f = false;
 		for (BitArray i : data) {
 			f = false;
